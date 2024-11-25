@@ -1,9 +1,11 @@
 import jwt from "jsonwebtoken";
-const JWT_SECREAT = "sudarsan2k5"
+import { JWT_SECREAT } from "./config";
 import express from "express";
+import { userMiddleware } from "./middleware";
 const app = express();
 
 import { UserModel } from "./db";
+import { ContentModel } from "./db"
 
 
 app.use(express.json());
@@ -50,18 +52,40 @@ app.post('/api/v1/signin', async (req, res) => {
     }
 });
 
-app.post('/api/v1/content', (req, res) => {
+app.post('/api/v1/content', userMiddleware, (req, res) => {
     const link = req.body.link;
-    const title = req.body.title;
-    // const 
+    const type = req.body.title;
+    ContentModel.create({
+        link: link,
+        type: type,
+        //@ts-ignore
+        userId: req.userId,
+        tags: []
+    })
+    res.json({
+        msg: "Content added"
+    })
 });
 
-app.get('/api/v1/contents', (req, res) => {
-
+app.get('/api/v1/contents', userMiddleware, async (req, res) => {
+    //@ts-ignore
+    const userId = req.userId;
+    const content = await ContentModel.find({
+        userId: userId
+    }).populate("userId", "username")
+    res.json({
+        content
+    })
 });
 
-app.delete('/api/v1/content', (req, res) => {
+app.delete('/api/v1/content', userMiddleware, async (req, res) => {
+    const contentId = req.body.contentId;
 
+    await ContentModel.deleteMany({
+        contentId,
+        //@ts-ignore
+        userId: req.userId
+    })
 });
 
 app.post('/api/v1/brain/share', (req, res) => {
