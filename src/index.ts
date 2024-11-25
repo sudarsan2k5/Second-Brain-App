@@ -86,6 +86,10 @@ app.delete('/api/v1/content', userMiddleware, async (req, res) => {
         //@ts-ignore
         userId: req.userId
     })
+
+    res.json({
+        message: "Deleted Content :("
+    })
 });
 
 app.post('/api/v1/brain/share', (req, res) => {
