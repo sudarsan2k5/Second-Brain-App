@@ -4,9 +4,8 @@ import express from "express";
 import { userMiddleware } from "./middleware";
 const app = express();
 
-import { UserModel } from "./db";
-import { ContentModel } from "./db"
-
+import { ContentModel, LinkModel, UserModel } from "./db";
+import { random } from "./utils";
 
 app.use(express.json());
 app.post('/api/v1/signup', async (req, res) => {
@@ -92,8 +91,25 @@ app.delete('/api/v1/content', userMiddleware, async (req, res) => {
     })
 });
 
-app.post('/api/v1/brain/share', (req, res) => {
 
+app.post('/api/v1/brain/share', userMiddleware, async (req, res) => {
+    const share = req.body.share;
+    if(share){
+        await LinkModel.create({
+            //userId: req.userId,
+            userId: (req as any).userId,
+            hash: random(10)
+        });
+    }else{
+        await LinkModel.deleteOne({
+            // userId: req.userId//-
+            userId: (req as any).userId
+        })
+    }
+
+    res.json({
+        message: "Updated Shared Link"
+    })
 })
 
 app.get('/api/v1/brain/:shareLink', (req, res) => {
