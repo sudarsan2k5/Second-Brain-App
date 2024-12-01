@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { JWT_SECREAT } from "./config";
 import express from "express";
+import cors from 'cors'
 import { userMiddleware } from "./middleware";
 const app = express();
 
@@ -8,6 +9,7 @@ import { ContentModel, LinkModel, UserModel } from "./db";
 import { random } from "./utils";
 
 app.use(express.json());
+app.use(cors())
 app.post('/api/v1/signup', async (req, res) => {
     // make a zod validation, hash the password
     const username = req.body.username;
